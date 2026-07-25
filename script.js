@@ -12,6 +12,11 @@ const winnerText=document.getElementById("winnerSubText");
 
 const newGameBtn=document.getElementById("newGameBtn");
 
+const HUMAN = "X";
+const AI = "O";
+
+let vsComputer = true;
+
 let board=["","","","","","","","",""];
 
 let currentPlayer="X";
@@ -49,7 +54,7 @@ const coordinates={
 
 };
 
-cells.forEach(cell=> {
+cells.forEach(cell=>{
 
 cell.addEventListener("click",clickCell);
 
@@ -58,6 +63,10 @@ cell.addEventListener("click",clickCell);
 restart.addEventListener("click",restartGame);
 
 function clickCell(){
+    
+    if (gameOver) return;
+
+if (vsComputer && currentPlayer === AI) return;
 
 if(gameOver)return;
 
@@ -95,103 +104,258 @@ setTimeout(()=>{
 
     winnerText.textContent="🏆 Player "+board[a]+" Wins!";
 
-        modal.classList.add("show");
+    modal.classList.add("show");
 
-        },600);
+},600);
 
-        drawWinningLine(pattern);
+drawWinningLine(pattern);
 
-        return;
+return;
+
+}
+
+}
+
+if(!board.includes("")){
+
+statusText.textContent="Match Draw";
+
+setTimeout(()=>{
+
+    winnerText.textContent="🤝 It's a Draw!";
+
+    modal.classList.add("show");
+
+},500);
+
+gameOver=true;
+
+return;
+
+}
+
+if(currentPlayer === HUMAN){
+
+    currentPlayer = AI;
+
+    statusText.textContent = "Computer Thinking...";
+
+    setTimeout(aiMove,500);
+
+}else{
+
+    currentPlayer = HUMAN;
+
+    statusText.textContent = "Your Turn";
+
+}
+
+}
+
+function drawWinningLine(pattern){
+
+    const board = document.getElementById("board");
+    const boardRect = board.getBoundingClientRect();
+
+    const startCell = document.querySelector(`.cell[data-index="${pattern[0]}"]`);
+    const endCell = document.querySelector(`.cell[data-index="${pattern[2]}"]`);
+
+    const startRect = startCell.getBoundingClientRect();
+    const endRect = endCell.getBoundingClientRect();
+
+    const x1 = startRect.left + startRect.width / 2 - boardRect.left;
+    const y1 = startRect.top + startRect.height / 2 - boardRect.top;
+
+    const x2 = endRect.left + endRect.width / 2 - boardRect.left;
+    const y2 = endRect.top + endRect.height / 2 - boardRect.top;
+
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+
+    line.classList.remove("draw");
+    void line.offsetWidth;   // Restart animation
+    line.classList.add("draw");
+}
+
+function restartGame(){
+
+currentPlayer = HUMAN;
+board=["","","","","","","","",""];
+
+gameOver=false;
+
+currentPlayer="X";
+
+cells.forEach(cell=>{
+
+cell.textContent="";
+
+});
+
+statusText.textContent="Player X Turn";
+
+line.classList.remove("draw");
+
+line.setAttribute("x1",0);
+
+line.setAttribute("y1",0);
+
+line.setAttribute("x2",0);
+
+line.setAttribute("y2",0);
+modal.classList.remove("show");
+
+}
+
+newGameBtn.addEventListener("click",()=>{
+
+    modal.classList.remove("show");
+
+    restartGame();
+
+});
+
+function aiMove(){
+
+    if(gameOver) return;
+
+    const bestMove = minimax(board, AI).index;
+
+    board[bestMove] = AI;
+
+    cells[bestMove].textContent = AI;
+
+    checkWinner();
+
+    if(!gameOver){
+
+        currentPlayer = HUMAN;
+
+        statusText.textContent = "Your Turn";
+
+    }
+
+}
+
+
+function minimax(newBoard, player){
+
+    const empty = [];
+
+    for(let i=0;i<9;i++){
+
+        if(newBoard[i] === ""){
+
+            empty.push(i);
 
         }
 
+    }
+
+    if(checkWinnerFor(newBoard, HUMAN))
+        return {score:-10};
+
+    if(checkWinnerFor(newBoard, AI))
+        return {score:10};
+
+    if(empty.length===0)
+        return {score:0};
+
+    let moves=[];
+
+    for(let i=0;i<empty.length;i++){
+
+        let move={};
+
+        move.index=empty[i];
+
+        newBoard[empty[i]]=player;
+
+        if(player===AI){
+
+            move.score=minimax(newBoard,HUMAN).score;
+
+        }else{
+
+            move.score=minimax(newBoard,AI).score;
+
         }
 
-        if(!board.includes("")){
+        newBoard[empty[i]]="";
 
-        statusText.textContent="Match Draw";
+        moves.push(move);
 
-        setTimeout(()=>{
+    }
 
-            winnerText.textContent="🤝 It's a Draw!";
+    let bestMove;
 
-                modal.classList.add("show");
+    if(player===AI){
 
-                },500);
+        let bestScore=-10000;
 
-                gameOver=true;
+        for(let i=0;i<moves.length;i++){
 
-                return;
+            if(moves[i].score>bestScore){
 
-                }
+                bestScore=moves[i].score;
 
-                currentPlayer=currentPlayer=="X"?"O":"X";
+                bestMove=i;
 
-                statusText.textContent="Player "+currentPlayer+" Turn";
+            }
 
-                }
+        }
 
-                function drawWinningLine(pattern){
+    }else{
 
-                    const board = document.getElementById("board");
-                        const boardRect = board.getBoundingClientRect();
+        let bestScore=10000;
 
-                            const startCell = document.querySelector(`.cell[data-index="${pattern[0]}"]`);
-                                const endCell = document.querySelector(`.cell[data-index="${pattern[2]}"]`);
+        for(let i=0;i<moves.length;i++){
 
-                                    const startRect = startCell.getBoundingClientRect();
-                                        const endRect = endCell.getBoundingClientRect();
+            if(moves[i].score<bestScore){
 
-                                            const x1 = startRect.left + startRect.width / 2 - boardRect.left;
-                                                const y1 = startRect.top + startRect.height / 2 - boardRect.top;
+                bestScore=moves[i].score;
 
-                                                    const x2 = endRect.left + endRect.width / 2 - boardRect.left;
-                                                        const y2 = endRect.top + endRect.height / 2 - boardRect.top;
+                bestMove=i;
 
-                                                            line.setAttribute("x1", x1);
-                                                                line.setAttribute("y1", y1);
-                                                                    line.setAttribute("x2", x2);
-                                                                        line.setAttribute("y2", y2);
+            }
 
-                                                                            line.classList.remove("draw");
-                                                                                void line.offsetWidth;   // Restart animation
-                                                                                    line.classList.add("draw");
-                                                                                    }
+        }
 
-                                                                                    function restartGame(){
+    }
 
-                                                                                    board=["","","","","","","","",""];
+    return moves[bestMove];
 
-                                                                                    gameOver=false;
+}
 
-                                                                                    currentPlayer="X";
+function checkWinnerFor(boardState, player){
 
-                                                                                    cells.forEach(cell=>{
+    const wins=[
 
-                                                                                    cell.textContent="";
+        [0,1,2],
 
-                                                                                    });
+        [3,4,5],
 
-                                                                                    statusText.textContent="Player X Turn";
+        [6,7,8],
 
-                                                                                    line.classList.remove("draw");
+        [0,3,6],
 
-                                                                                    line.setAttribute("x1",0);
+        [1,4,7],
 
-                                                                                    line.setAttribute("y1",0);
+        [2,5,8],
 
-                                                                                    line.setAttribute("x2",0);
+        [0,4,8],
 
-                                                                                    line.setAttribute("y2",0);
-                                                                                    modal.classList.remove("show");
+        [2,4,6]
 
-                                                                                    }
+    ];
 
-                                                                                    newGameBtn.addEventListener("click",()=>{
+    return wins.some(pattern=>{
 
-                                                                                        modal.classList.remove("show");
+        return pattern.every(index=>boardState[index]===player);
 
-                                                                                            restartGame();
+    });
 
-                                                                                            });
-                                                                                            
+}
+
