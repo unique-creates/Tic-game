@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe</title>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>Tic Tac Toe</h1>
+
+<div class="game">
+
+    <div class="board" id="board">
+
+            <div class="cell" data-index="0"></div>
+                    <div class="cell" data-index="1"></div>
+                            <div class="cell" data-index="2"></div>
+
+                                    <div class="cell" data-index="3"></div>
+                                            <div class="cell" data-index="4"></div>
+                                                    <div class="cell" data-index="5"></div>
+
+                                                            <div class="cell" data-index="6"></div>
+                                                                    <div class="cell" data-index="7"></div>
+                                                                            <div class="cell" data-index="8"></div>
+
+                                                                                    <svg id="winSVG">
+                                                                                                <line id="winLine"></line>
+                                                                                                        </svg>
+
+                                                                                                            </div>
+
+                                                                                                            </div>
+
+                                                                                                            <h2 id="status">Player X Turn</h2>
+
+                                                                                                            <button id="restart">Restart Game</button>
+
+                                                                                                            <div id="winnerModal" class="modal">
+
+                                                                                                                <div class="modal-box">
+
+                                                                                                                        <h1 id="winnerEmoji">🎉</h1>
+
+                                                                                                                                <h2 id="winnerText">Congratulations!</h2>
+
+                                                                                                                                        <p id="winnerSubText">Player X Wins</p>
+
+                                                                                                                                                <button id="newGameBtn">
+                                                                                                                                                            New Game
+                                                                                                                                                                    </button>
+
+                                                                                                                                                                        </div>
+
+                                                                                                                                                                        </div>
+
+                                                                                                                                                                        <script src="script.js"></script>
+
+                                                                                                                                                                        </body>
+                                                                                                                                                                        </html>
