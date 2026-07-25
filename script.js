@@ -12,8 +12,18 @@ const winnerText=document.getElementById("winnerSubText");
 
 const newGameBtn=document.getElementById("newGameBtn");
 
+const difficultySelect=document.getElementById("difficulty");
+
+difficultySelect.addEventListener("change",()=>{
+
+    difficulty=difficultySelect.value;
+
+});
+
 const HUMAN = "X";
 const AI = "O";
+
+let difficulty = "hard";
 
 let vsComputer = true;
 
@@ -67,8 +77,6 @@ function clickCell(){
     if (gameOver) return;
 
 if (vsComputer && currentPlayer === AI) return;
-
-if(gameOver)return;
 
 const index=this.dataset.index;
 
@@ -221,26 +229,47 @@ function aiMove(){
 
     if(gameOver) return;
 
-    const bestMove = minimax(board, AI).index;
+    let bestMove;
 
-    board[bestMove] = AI;
+    if(difficulty==="easy"){
 
-    cells[bestMove].textContent = AI;
-
-    checkWinner();
-
-    if(!gameOver){
-
-        currentPlayer = HUMAN;
-
-        statusText.textContent = "Your Turn";
+        bestMove=randomMove();
 
     }
 
+    else if(difficulty==="medium"){
+
+        if(Math.random()<0.5)
+            bestMove=randomMove();
+        else
+            bestMove=minimax(board,AI).index;
+
+    }
+
+    else if(difficulty==="hard"){
+
+        if(Math.random()<0.2)
+            bestMove=randomMove();
+        else
+            bestMove=minimax(board,AI).index;
+
+    }
+
+    else{
+
+        bestMove=minimax(board,AI).index;
+
+    }
+
+    board[bestMove]=AI;
+
+    cells[bestMove].textContent=AI;
+
+    checkWinner();
+
 }
 
-
-function minimax(newBoard, player){
+function minimax(newBoard, player, depth=0){
 
     const empty = [];
 
@@ -254,11 +283,11 @@ function minimax(newBoard, player){
 
     }
 
-    if(checkWinnerFor(newBoard, HUMAN))
-        return {score:-10};
-
     if(checkWinnerFor(newBoard, AI))
-        return {score:10};
+    return {score:10-depth};
+
+if(checkWinnerFor(newBoard, HUMAN))
+    return {score:depth-10};
 
     if(empty.length===0)
         return {score:0};
@@ -275,11 +304,11 @@ function minimax(newBoard, player){
 
         if(player===AI){
 
-            move.score=minimax(newBoard,HUMAN).score;
+            move.score=minimax(newBoard,HUMAN,depth+1).score;
 
         }else{
 
-            move.score=minimax(newBoard,AI).score;
+            move.score=minimax(newBoard,AI,depth+1).score;
 
         }
 
@@ -356,6 +385,24 @@ function checkWinnerFor(boardState, player){
         return pattern.every(index=>boardState[index]===player);
 
     });
+
+}
+
+function randomMove(){
+
+    const empty=[];
+
+    for(let i=0;i<9;i++){
+
+        if(board[i]==""){
+
+            empty.push(i);
+
+        }
+
+    }
+
+    return empty[Math.floor(Math.random()*empty.length)];
 
 }
 
