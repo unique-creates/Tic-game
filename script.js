@@ -49,7 +49,7 @@ const coordinates={
 
 };
 
-cells.forEach(cell=>{
+cells.forEach(cell=> {
 
 cell.addEventListener("click",clickCell);
 
